@@ -1,0 +1,25 @@
+{
+  "name": "tv-broadcast",
+  "version": "0.0.8",
+  "description": "LiveU TV Broadcast SDK and application sample",
+  "authors": [
+    "Kurento <info@kurento.org>"
+  ],
+  "main": "index.html",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "ALv2",
+  "homepage": "http://www.kurento.org/",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "adapter.js": "v0.2.9"
+  }
+}

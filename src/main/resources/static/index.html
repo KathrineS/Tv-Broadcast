@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>LiveU TV Broadcast News Room</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link href="bootstrap.css" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" type="text/css" media="screen">
+<script src="bower_components/adapter.js/adapter.js"></script>
+<script src="js/kurento-utils.js"></script>
+<script src="js/tv-broadcast.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZ3R112_IV7fVHmShVkv9YM8F01f0Aqs4"></script>
+<!--  async defer  -->
+
+<style type="text/css">
+body {
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
+.glass-panel {
+	z-index: 90;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	top: 0;
+	left: 0;
+	opacity: 0.8;
+	background-color: Gray;
+}
+
+.div-modal {
+	z-index: 100;
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 350px;
+	height: 240px;
+	-moz-transition-property: left top;
+	-o-transition-property: left top;
+	-webkit-transition-duration: 200ms;
+	-moz-transition-duration: 200ms;
+	-o-transition-duration: 200ms;
+}
+
+.static-room {
+	position:relative;
+	width: 260px;
+	height: 90px;
+	float: left;
+	margin: 10px;
+	color: white;
+	border: 4px solid gray;
+	padding: 10px;
+}
+
+.static-room-active {
+	border: 4px solid #73AD21;
+}
+
+/* .static-room input[type=button] { */
+.button-room {
+	position: absolute;
+	bottom: 10px;
+	right: 110px;
+	display: none;
+	width: 35px !important;
+	height: 18px !important;
+}
+
+.static-room h3 {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+
+.local-section {
+	padding: 10px;
+	padding: 10px;
+	color: MediumBlue;
+}
+
+.button-room-OLD {
+	width: 35px !important;
+	height: 18px !important;
+	margin-top: 20px !important;
+	margin: 0 auto;
+	display: none;
+}
+
+/*
+.static-room:hover .button-room {
+	display: block;
+}
+
+.participants-table tr:first-child {
+	background: BurlyWood;
+}
+*/
+
+.user {
+	position: relative;
+	border-radius: 4px;
+	/* border: 2px groove; */
+	margin-left: 5px;
+	margin-right: 5px;
+	width: 170px;
+	text-align: center;
+	overflow: hide;
+	float: left;
+	padding: 10px;
+	border-radius: 10px;
+	-webkit-box-shadow: 0 0 200px rgba(255, 255, 255, 0.5), 0 1px 2px
+		rgba(0, 0, 0, 0.3);
+	box-shadow: 0 0 200px rgba(255, 255, 255, 0.5), 0 1px 2px
+		rgba(0, 0, 0, 0.3);
+	/*Transition*/
+	-webkit-transition: all 0.3s linear;
+	-moz-transition: all 0.3s linear;
+	-o-transition: all 0.3s linear;
+	transition: all 0.3s linear;
+	border: 4px solid White;
+	/* background: White; */
+}
+
+.user video, .user.main video {
+	width: 165px ! important;
+	height: auto ! important;
+}
+
+.user span {
+	position: relative;
+	color: #005BA0;
+}
+
+
+.user-video-button {
+	position: absolute;
+	bottom: 28px;
+	left: 60px;
+	display: none;
+	width: 20px !important;
+	height: 18px !important;
+}
+
+.user-move-button {
+	position: absolute;
+	bottom: 58px;
+	left: 60px;
+	display: none;
+	width: 20px !important;
+	height: 18px !important;
+}
+
+.user-live-button {
+	position: absolute;
+	bottom: 58px;
+	left: 60px;
+	display: none;
+	width: 20px !important;
+	height: 18px !important;
+}
+
+.user.me {
+	background-color: White;
+}
+
+.user.selected {
+	border: 4px solid #FF7BB4;
+}
+
+.user.playuri {
+	border: 4px solid Green;
+}
+
+.user.me span {
+	position: relative;
+	color: black;
+}
+
+.user.main video {
+	height: auto;
+}
+
+.user-video-next {
+	position: relative;
+	border-radius: 4px;
+	/* border: 2px groove; */
+	margin-left: 5px;
+	margin-right: 5px;
+	width: 100%;
+	text-align: center;
+	overflow: hide;
+	float: left;
+	padding: 10px;
+	border-radius: 10px;
+	-webkit-box-shadow: 0 0 200px rgba(255, 255, 255, 0.5), 0 1px 2px
+		rgba(0, 0, 0, 0.3);
+	box-shadow: 0 0 200px rgba(255, 255, 255, 0.5), 0 1px 2px
+		rgba(0, 0, 0, 0.3);
+	/*Transition*/
+	-webkit-transition: all 0.3s linear;
+	-moz-transition: all 0.3s linear;
+	-o-transition: all 0.3s linear;
+	transition: all 0.3s linear;
+	/* background: White; */
+}
+
+.user-video-next video {
+	width: 98% ! important;
+	height: auto ! important;
+}
+
+.user-video-next span {
+	position: relative;
+	color: #005BA0;
+}
+
+.live {
+	position: absolute;
+	top: 67px;
+	left: 480px;
+	z-index: 100px;
+	border-radius: 4px;
+	/* border: 2px groove; */
+	margin-left: 5;
+	margin-right: 5;
+	text-align: center;
+	overflow: hide;
+	float: left;
+	width: 110px;
+	padding: 10px;
+	border-radius: 10px;
+	-webkit-box-shadow: 0 0 200px rgba(255, 255, 255, 0.5), 0 1px 2px
+		rgba(0, 0, 0, 0.3);
+	box-shadow: 0 0 200px rgba(255, 255, 255, 0.5), 0 1px 2px
+		rgba(0, 0, 0, 0.3);
+	/*Transition*/
+	-webkit-transition: all 0.3s linear;
+	-moz-transition: all 0.3s linear;
+	-o-transition: all 0.3s linear;
+	transition: all 0.3s linear;
+	border: 4px solid White;
+	/* background: White; */
+}
+
+.live video {
+	width: 105px ! important;
+	height: auto ! important;
+}
+
+.live span {
+	position: relative;
+	color: #005BA0;
+}
+
+.live.me {
+	top: 50px;
+	left: 50px;
+	z-index: 80;
+	width: 560px ! important;
+	background-color: White;
+}
+
+.live.me span {
+	position: relative;
+	color: White;
+}
+
+.live.me video {
+	width: 555px ! important;
+	height: auto ! important;
+}
+
+#chat_box {
+	width: 90%;
+	height: 300px;
+	overflow: auto;
+	border: 2px solid MediumBlue;
+	background: #FFEFD5;
+}
+
+#chat_input {
+	width: 70%;
+	border: 2px solid Green;
+}
+
+select {
+	font-family: 'Lucida Grande', Tahoma, Verdana, sans-serif;
+	font-size: 14px;
+	margin: 5px;
+	padding: 0 10px;
+	width: 200px;
+	height: 34px;
+	color: #404040;
+	background: white;
+	border: 1px solid;
+	border-color: #c4c4c4 #d1d1d1 #d4d4d4;
+	border-radius: 2px;
+	outline: 5px solid #eff4f7;
+	-moz-outline-radius: 3px;
+	-webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+option:before {
+    content: "  ";
+    height: 10px;
+    width: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+option.Blue:before { background: Blue; }
+option.Green:before { background: Green; }
+option.BurlyWood:before { background: BurlyWood; }
+option.CornflowerBlue:before { background: CornflowerBlue; }
+option.DarkKhaki:before { background: DarkKhaki; }
+option.DarkOrange:before { background: DarkOrange; }
+option.DeepSkyBlue:before { background: DeepSkyBlue; }
+option.Khaki:before { background: Khaki; }
+option.NavajoWhite:before { background: NavajoWhite; }
+
+</style>
+</head>
+
+
+<body onload="initPage()">
+
+	<div class="navbar-fixed-top" style="background-color: white">
+		<table style="width: 100%">
+			<tr style="border-bottom: 2px solid #005BA0">
+				<td width="15%"></td>
+				<td align="center"><img src="img/logo.png"></td>
+				<td width="15%"><h4 style="color: #005BA0" id="statusLogin">not
+						logged!</h4></td>
+			</tr>
+		</table>
+	</div>
+
+	<div id="main_area">
+		<!-- page 0 at load -->
+		<div id="page_0" style="width: 100%; height: 2000px;"></div>
+		<!-- EOF page at load -->
+
+		<!-- page 1 -->
+		<div id="page_1" style="padding-top: 55px; margin-left: 10px;">
+
+                    <div style="padding: 10px;">
+                        <div style="float: right; margin-right: 50px">
+                            <input id="btnCreateRoom" type="button" value="Create Room"
+                                onclick="showCreateRoomPanel()">
+                            <input id="btnLogin" type="button" value="Login"
+                                onclick="showLoginPanel()">
+                        </div>
+
+                        <div style="float: left; width: 100%">
+            			<h3 align="center" class="local-section">Current News Rooms</h3>
+        		</div>
+                    </div>
+
+                        
+			<div id="roomList" class="container" style="width: 100%"></div>
+
+			<div style="padding-top: 20px; clear: left">
+				<table style="width: 100%">
+					<tr style="border-bottom: 2px solid #005BA0">
+						<td></td>
+					</tr>
+				</table>
+			</div>
+
+                        <div id="producerRoomPane" style="display: none;">
+                            <h3 class="local-section">Producer Rooms</h3>
+                            <div id="producerRoomList" class="container" style="width: 100%"></div>
+
+                            <div style="padding-top: 20px; clear: left">
+				<table style="width: 100%">
+					<tr style="border-bottom: 2px solid #005BA0">
+						<td></td>
+					</tr>
+				</table>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="local-section">Recent users</h3>
+                            <div id="recentUsersPane">
+				<ul>
+					<li><img src="img/img_avatar2.png"
+						style="width: 35px; margin: 10px"><b>John</b></li>
+					<li><img src="img/img_avatar5.png"
+						style="width: 35px; margin: 10px"><b>Bella</b></li>
+					<li><img src="img/img_avatar6.png"
+						style="width: 35px; margin: 10px"><b>James</b></li>
+				</ul>
+                            </div>
+			</div>
+
+			<div style="padding-top: 20px; clear: left">
+				<table style="width: 100%">
+					<tr style="border-bottom: 2px solid #005BA0">
+						<td></td>
+					</tr>
+				</table>
+			</div>
+
+			<!-- Footer -->
+			<div id="footer_1">
+				<h4 class="local-section" align="center">Copyright &copy; 2016 LiveU</h4>
+			</div>
+			<!-- EOF Footer -->
+
+		</div>
+		<!-- EOF page 1 -->
+
+
+		<!-- page 2 -->
+		<div id="page_2" style="padding-top: 55px; width: 100%; height: 100%">
+
+                    <div id="panel_room_header" style="padding: 10px; margin-left: 50px">
+                        <div style="float: right; margin-right: 50px">
+                            <input id="btnMuteRoom" type="button" Value="Mute Room"
+                                   onclick="clickMuteRoom()">
+                            <input id="btnRoomList" type="button" Value="Leave Room"
+                                   onclick="clickBackFromNewsRoom()">
+                        </div>
+
+                        <div style="float: left; width: 100%">
+                            <h3 align="center" class="local-section" id="room-header">no
+                                active room!</h3>
+                        </div>
+                    </div>
+
+			<div id="panel_video" style="float: left; width: 60%">
+
+				<div id="panel_rooms"
+					style="min-height: 300px; overflow: auto;">
+					<h4 class="local-section" align="center">Participants</h4>
+					<div id="participants" class="participants-table"></div>
+				</div>
+
+				<div id="panel_video_next"
+					style="float: left; min-height: 200px; width: 45%;">
+					<h4 class="local-section" align="center">Next translation</h4>
+						<div id="video_next"></div>
+						<input id="btnStartLive" type="button" value="Start Live!" style="margin: 15px;"
+							onclick="clickStartLive()">
+				</div>
+
+				<div id="panel_video_live"
+					style="float: left; min-height: 200px; width: 45%; margin-left: 20px">
+					<h4 class="local-section" align="center">Live</h4>
+					<div  class="user-video-next">
+					<iframe 
+						src="https://www.youtube.com/embed/mM5_T-F1Yn4" frameborder="0"
+						allowfullscreen></iframe>
+						</div>
+				</div>
+
+			</div>
+
+			<div id="panel_chat_map"
+				style="float: left; width: 40%; min-height: 500px">
+				<div id="panel_map" style="width: 90%; min-height: 200px; padding-left: 20px; margin: 20px;"></div>
+
+				<div id="panel_chat" style="width: 100%; min-height: 200px; padding-left: 20px;">
+					<h4 class="local-section" align="center">Chat</h4>
+					<pre id="chat_box"></pre>
+					<textarea id="chat_input" rows="2" cols="120"></textarea>
+					<input type="button" style="margin: 15px;" value="Send" onclick="clickSendChatMessage()">			
+				
+				</div>
+
+			</div>
+
+			<div style="padding-top: 20px; clear: left">
+				<table style="width: 100%">
+					<tr style="border-bottom: 2px solid #005BA0">
+						<td></td>
+					</tr>
+				</table>
+			</div>
+
+			<!-- Footer -->
+			<div id="footer_2">
+				<h4 class="local-section" align="center">Copyright &copy; 2016 LiveU</h4>
+			</div>
+			<!-- EOF Footer -->
+			
+		</div>
+		<!-- EOF page 2 -->
+		
+		<!--  page 3 -->
+		<div id="page_3" style="padding-top: 55px; width: 100%; height: 100%; display: none;">
+                    <div id="panel_producer_room_header" style="padding: 10px; margin-left: 50px">
+                        <div style="float: right; margin-right: 50px">
+                            <input type="button" Value="Add Media URL"
+                                   onclick="showAddStreamPanel()">
+                            <input id="btnMailProducerRoom" type="button" Value="Mail Room URL"
+                                   onclick="clickMailProducerRoom()">
+                            <input id="btnMuteProducerRoom" type="button" Value="Mute Room"
+                                   onclick="clickMuteRoom()">
+                            <input type="button" Value="Leave Room"
+                                   onclick="clickBackFromProducerRoom()">
+                        </div>
+                        <div style="float: left; width: 100%">
+                            <h3 align="center" class="local-section" id="producer-room-header">no
+                                active room!</h3>
+                        </div>
+                    </div>
+
+			<div id="panel_video" style="float: left; width: 60%">
+
+				<div id="panel_producer_rooms"
+					style="min-height: 300px; overflow: auto;">
+					<h4 class="local-section" align="center">Participants</h4>
+					<div id="producerParticipants" class="participants-table"></div>
+				</div>
+
+			</div>
+			
+			<div style="padding-top: 20px; clear: left">
+				<table style="width: 100%">
+					<tr style="border-bottom: 2px solid #005BA0">
+						<td></td>
+					</tr>
+				</table>
+			</div>
+                    
+                        <!-- Footer -->
+			<div id="footer_3">
+				<h4 class="local-section" align="center">Copyright &copy; 2016 LiveU</h4>
+			</div>
+			<!-- EOF Footer -->
+		</div>
+		<!--  EOF page 3 -->
+			
+		<!--  page 4 -->
+		<div id="page_4" style="padding-top: 55px; width: 100%; height: 100%; display: none;">
+
+			<div id="panel_tr_header" style="padding: 10px; margin-left: 50px">
+				<h3 align="center" class="local-section" id="room-tr-header"></h3>
+			</div>
+			
+			<div id="panel_translation" style="float: left; width: 100%">
+				<div id="lives"></div>
+				<div id="central"></div>
+			</div>
+			<div id="panel_tr_btn" style="position: absolute; top: 520px; float: left; width: 100%;">
+				<input id="btnBackRoom" style="position: relative; margin: 20px;" type="button" Value="Back to room" onclick="backRoomPage()">
+				<input id="btnConnectCentral" style="position: relative; margin: 20px;" type="button" Value="Connect to Central" onclick="connectCentral()">
+			</div>
+			
+		</div>
+		<!--  EOF page 4 -->
+			
+		
+	</div>
+	<!-- EOF main_area -->
+
+
+	<!-- modal panel section -->
+	<!-- login panel -->
+	<div id="loginPanel" class="div-modal" style="visibility: hidden">
+		<form onsubmit="clickLoginPanel(); return false;"
+			accept-charset="UTF-8">
+			<table>
+				<tr>
+					<td></td>
+					<td align="center"><h1>Please, login</h1></td>
+				</tr>
+
+				<tr>
+					<td><h3>Login:</h3></td>
+					<td><input id="login" type="text" name="login" value=""
+						placeholder="Login" required></td>
+				</tr>
+
+				<tr>
+					<td><h3>Password:</h3></td>
+					<td><input id="password" type="password" name="password"
+						value="" placeholder="Password"></td>
+				</tr>
+                                
+                                <tr>
+                                    <td><h3>Role:</h3></td>
+                                    <td><select id="role" style='width: 222px;'>
+                                            <option value='participant' selected>Participant</option>
+                                            <option value='producer'>Producer</option>
+                                        </select>
+                                    </td>
+                                </tr>
+				<tr>
+					<td></td>
+					<td align="center"><input type="submit"
+						class="btn btn-success" style="margin: 20px" value="OK"> <input
+						type="button" class="btn btn-danger" style="margin: 10px"
+						value="Cancel" onclick="hideLoginPanel()"></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+
+	<!-- create new room panel -->
+	<div id="create_room" class="div-modal" style="visibility: hidden">
+		<form onsubmit="clickCreateRoom(); return false;"
+			accept-charset="UTF-8">
+                        <input id="moveUserName" type="hidden">
+			<table>
+				<tr>
+					<td></td>
+					<td align="center"><h1>Create a New Room</h1></td>
+				</tr>
+				<tr>
+					<td><h3>Room:</h3></td>
+					<td><input id="newRoomName" type="text" name="newRoomName"
+						value="" placeholder="Room" required></td>
+				</tr>
+				<tr>
+					<td><h3>Description:</h3></td>
+					<td><input id="newRoomDescr" type="text" name="newRoomDescr"
+						value="" placeholder="Description">
+                                        <input type="hidden" id="newRoomImageURL" value="room.png"></td>
+				</tr>
+                                 <tr>
+                                    <td><h3>Color:</h3></td>
+                                    <td><select id="newRoomColor" style='width: 222px;'>
+                                            <option class="Blue" value="Blue" selected>Blue</option>
+                                            <option class="Green" value="Green">Green</option>
+                                            <option class="BurlyWood" value="BurlyWood">BurlyWood </option>
+                                            <option class="CornflowerBlue" value="CornflowerBlue">CornflowerBlue</option>
+                                            <option class="DarkKhaki" value="DarkKhaki">DarkKhaki</option>
+                                            <option class="DarkOrange" value="DarkOrange">DarkOrange</option>
+                                            <option class="DeepSkyBlue" value="DeepSkyBlue">DeepSkyBlue</option>
+                                            <option class="Khaki" value="Khaki">Khaki</option>
+                                            <option class="NavajoWhite" value="NavajoWhite">NavajoWhite</option>
+                                        </select>
+                                    </td>
+                                </tr>
+				<tr>
+					<td></td>
+					<td align="center"><input type="submit"
+						class="btn btn-success" style="margin: 20px" value="OK"> <input
+						type="button" class="btn btn-danger" style="margin: 10px"
+						value="Cancel" onclick = "hideCreateRoom()"></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+
+
+      	<!-- create new room for producer panel -->
+	<div id="create_room_producer" class="div-modal" style="visibility: hidden">
+		<form onsubmit="clickCreateProducerRoom(); return false;"
+			accept-charset="UTF-8">
+			<table>
+				<tr>
+					<td></td>
+					<td align="center"><h1>Create a New Room</h1></td>
+				</tr>
+				<tr>
+					<td><h3>Room:</h3></td>
+					<td><input id="newRoomProducerName" type="text" name="newRoomProducerName"
+						value="" placeholder="Room" required></td>
+				</tr>
+				<tr>
+					<td><h3>Description:</h3></td>
+					<td><input id="newRoomProducerDescr" type="text" name="newRoomProducerDescr"
+						value="" placeholder="Description">
+                                            <input type="hidden" id="newRoomProducerImageURL" value="room.png"></td>
+				</tr>
+                                 <tr>
+                                    <td><h3>Color:</h3></td>
+                                    <td><select id="newRoomProducerColor" style='width: 222px;'>
+                                            <option class="Blue" value="Blue" selected>Blue</option>
+                                            <option class="Green" value="Green">Green</option>
+                                            <option class="BurlyWood" value="BurlyWood">BurlyWood </option>
+                                            <option class="CornflowerBlue" value="CornflowerBlue">CornflowerBlue</option>
+                                            <option class="DarkKhaki" value="DarkKhaki">DarkKhaki</option>
+                                            <option class="DarkOrange" value="DarkOrange">DarkOrange</option>
+                                            <option class="DeepSkyBlue" value="DeepSkyBlue">DeepSkyBlue</option>
+                                            <option class="Khaki" value="Khaki">Khaki</option>
+                                            <option class="NavajoWhite" value="NavajoWhite">NavajoWhite</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><h3>Room type:</h3></td>
+                                    <td><select id="newRoomProducerType" style="width: 222px;">
+                                            <option value="producer" selected>Producer Room</option>
+                                            <option value="public">News Room</option>
+                                        </select>
+                                    </td>
+                                </tr>
+				<tr>
+					<td></td>
+					<td align="center"><input type="submit"
+						class="btn btn-success" style="margin: 20px" value="OK"> <input
+						type="button" class="btn btn-danger" style="margin: 10px"
+						value="Cancel" onclick="hideCreateProducerRoom()"></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+
+
+      	<!-- move news user selection for producer panel -->
+	<div id="moveUserPanel" class="div-modal" style="visibility: hidden">
+		<form onsubmit="clickMoveUser2ProducerRoom(); return false;"
+			accept-charset="UTF-8">
+			<table>
+				<tr>
+					<td></td>
+					<td align="center"><h1 id="moveProducerUser">Move participant to Producer Room</h1></td>
+				</tr>
+                                 <tr>
+                                    <td><h3>Producer Room:</h3></td>
+                                    <td><select id="producerRoomListSelect" style='width: 222px;'>
+                                        </select>
+                                    </td>
+                                </tr>
+				<tr>
+					<td></td>
+					<td align="center"><input type="submit"
+						class="btn btn-success" style="margin: 20px" value="OK"> <input
+						type="button" class="btn btn-danger" style="margin: 10px"
+						value="Cancel" onclick="hideMoveUser2ProducerRoom()"></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+
+
+      	<!-- add stream in producer room -->
+	<div id="addStreamPanel" class="div-modal" style="visibility: hidden">
+            <form onsubmit="clickAddStream(); return false;"
+                  accept-charset="UTF-8">
+                <table>
+                    <tr>
+                        <td></td>
+                        <td align="center"><h1>Add Media to Room</h1></td>
+                    </tr>
+                    <tr>
+                        <td><h3>Media Title:</h3></td>
+                        <td><input id="addStreamTitle" type="text" required>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><h3>Media URI:</h3></td>
+                        <td><input id="addStreamUri" type="text" required>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td align="center"><input type="submit"
+                                                  class="btn btn-success" style="margin: 20px" value="OK"> <input
+                                                  type="button" class="btn btn-danger" style="margin: 10px"
+                                                  value="Cancel" onclick="hideAddStreamPanel()"></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+
+	<!-- glass panel -->
+	<div id="glassPanel" class="glass-panel" style="visibility: hidden"></div>
+
+</body>
+</html>
